@@ -57,9 +57,7 @@ WINEPREFIX="$directory" winetricks renderer=vulkan
 7z x "$directory/Winmetadata.zip" -o"$directory/drive_c/windows/system32"
 rm "$directory/Winmetadata.zip"
 # Start the setup
-echo "Put Setup .exe to $directory and press any key when ready."
-read -n 1
-
+echo "Place the downloaded Setup.exe to $directory."
 echo "Click No if you get any errors. Press any key to continue."
 read -n 1
 
