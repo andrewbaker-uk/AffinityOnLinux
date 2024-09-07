@@ -15,6 +15,7 @@ check_dependency "wget"
 check_dependency "curl"
 check_dependency "7z"
 check_dependency "tar"
+check_dependency "jq"
 
 if [ -n "$missing_deps" ]; then
   echo "The following dependencies are missing: $missing_deps"
@@ -33,9 +34,7 @@ wineserver -k
 mkdir -p "$directory"
 
 # Fetch the latest release information from GitHub
-asset_url=$(wget -qO- https://api.github.com/repos/Twig6943/ElementalWarrior-Wine-binaries/releases/latest | \
-grep "browser_download_url.*ElementalWarriorWine.tar.gz" | \
-cut -d '"' -f 4)
+asset_url=$(wget -qO- https://api.github.com/repos/Twig6943/ElementalWarrior-Wine-binaries/releases/latest | jq -r '.assets|last|.browser_download_url')
 
 # Download the specific release asset
 wget "$asset_url" -O "$directory/ElementalWarriorWine.tar.gz"
@@ -64,14 +63,17 @@ read -n 1
 echo "Click No if you get any errors. Press any key to continue."
 read -n 1
 
+# Kill Wine
+wineserver -k
+
 #Set windows version to 11
-WINEPREFIX="$directory" "$directory/ElementalWarriorWine/bin/winecfg" -v win11
-WINEPREFIX="$directory" "$directory/ElementalWarriorWine/bin/wine" "$directory"/*.exe
+WINEPREFIX="$directory" winecfg -v win11
+WINEPREFIX="$directory" wine "$directory"/*.exe
 rm "$directory"/affinity*.exe
 
 #Wine dark theme
 wget https://raw.githubusercontent.com/Twig6943/AffinityOnLinux/main/wine-dark-theme.reg -O "$directory/wine-dark-theme.reg"
-WINEPREFIX="$directory" "$directory/ElementalWarriorWine/bin/regedit" "$directory/wine-dark-theme.reg"
+WINEPREFIX="$directory" regedit "$directory/wine-dark-theme.reg"
 rm "$directory/wine-dark-theme.reg"
 
 #Remove Desktop entry created by wine
